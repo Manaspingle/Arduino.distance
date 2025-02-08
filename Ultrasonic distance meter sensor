@@ -1,0 +1,62 @@
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+
+// Define pins for the Ultrasonic sensor
+#define TRIG_PIN 9
+#define ECHO_PIN 10
+
+// Create an LCD object (address 0x27 is common for I2C LCDs)
+LiquidCrystal_I2C lcd(0x27, 16, 2); 
+
+void setup() {
+  // Start the serial communication for debugging
+  Serial.begin(9600);
+
+  // Set the TRIG_PIN as an OUTPUT and ECHO_PIN as an INPUT
+  pinMode(TRIG_PIN, OUTPUT);
+
+
+
+  
+  pinMode(ECHO_PIN, INPUT);
+  
+  // Initialize the LCD (without parameters)
+  lcd.begin();  // Just call begin() with no parameters
+  lcd.setBacklight(1); // Turn on the backlight
+  lcd.clear();
+  
+  // Print a welcome message on the LCD
+  lcd.setCursor(0, 0);
+  lcd.print("Distance: ");
+}
+
+void loop() {
+  // Send a 10 microsecond pulse to trigger the ultrasonic sensor
+  digitalWrite(TRIG_PIN, LOW); // Ensure the TRIG_PIN is LOW initially
+  delayMicroseconds(2);
+  digitalWrite(TRIG_PIN, HIGH); // Send pulse
+  delayMicroseconds(10);
+  digitalWrite(TRIG_PIN, LOW); // Stop sending pulse
+
+  // Read the duration of the ECHO_PIN pulse
+  long duration = pulseIn(ECHO_PIN, HIGH);
+
+  // Calculate the distance in centimeters
+  long distance = (duration / 2) * 0.0343;
+
+  // Clear the LCD and display the distance
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Distance: ");
+  lcd.setCursor(0, 1);
+  lcd.print(distance);
+  lcd.print(" cm");
+  
+  // Optionally, print the distance to the Serial Monitor
+  Serial.print("Distance: ");
+  Serial.print(distance);
+  Serial.println(" cm");
+
+  // Delay for a while before measuring again
+  delay(500);
+}
